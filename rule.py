@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import string
-import pattern
 from copy import deepcopy
 
 from pyinflect import getInflection
