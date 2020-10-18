@@ -126,6 +126,8 @@ class Question:
 
     def _get_children(self, node, rels, loc='right'):
         assert (loc in ['left', 'right', 'anywhere'])
+        if node is None:
+            return []
         head_id = node['id']
         children = []
         for tok in self.question:
