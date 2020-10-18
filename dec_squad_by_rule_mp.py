@@ -139,9 +139,9 @@ def process_entry(entry):
 
 
 if __name__ == '__main__':
-    squad_dev_path = "/Users/yuvalkirstain/school/repos/qanli/squad/dev-v1.1.json"
-    out_path = "/Users/yuvalkirstain/school/repos/qanli/squad/mp-declarative-dev-v1.1.json"
-    max_workers = 2
+    squad_dev_path = "squad/dev-v1.1.json"
+    out_path = "squad/mp-declarative-dev-v1.1.json"
+    max_workers = 8
 
 
 
