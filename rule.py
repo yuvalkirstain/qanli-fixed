@@ -3,6 +3,9 @@
 import string
 import pattern
 from copy import deepcopy
+from pattern.text import conjugate
+from pyinflect import getInflection
+from nltk.stem import WordNetLemmatizer
 
 alpha = string.ascii_uppercase
 alpha_lower = string.ascii_lowercase
@@ -52,6 +55,7 @@ class Question:
         self.isvalid = self._is_valid()
         self.lastword_idx = self._lastword_idx()
         self.dangling_prep = self._dangling_prep()
+        self.lemmatizer = WordNetLemmatizer()
 
         # Get the subject
         subj_nodes = self._get_children(self.root, ['nsubj', 'nsubj:pass', 'csubj'], 'anywhere')
@@ -379,8 +383,7 @@ class Question:
                 or self.aux_precedes_verb:
             self._answer_pos = startidx
             self.type = 'SUBJ'
-        elif (a.type.startswith('V') or a.cop is not None) \
-                and (root['form'] in VERB_DO or (len(comps) > 0 and comps[0]['form'] in VERB_DO)):
+        elif a.type is not None and ((a.type.startswith('V') or a.cop is not None) and (root['form'] in VERB_DO or (len(comps) > 0 and comps[0]['form'] in VERB_DO))):
             if len(comps) > 0 and comps[0]['form'] in VERB_DO:
                 self._answer_pos = comps[0]['id']
             else:
@@ -494,12 +497,17 @@ class Question:
                 if tok['form'] == 'leave':
                     new_form = 'left'
                 else:
-                    new_form = pattern.en.conjugate(tok['form'], tense='past')
+                    # new_form = conjugate(tok['form'], tense='past')
+                    new_form = getInflection(self.lemmatizer.lemmatize(tok['form'], pos='v'), 'VBD', inflect_oov=True)[0]
                 tok['form'] = new_form
                 tok['xpostag'] = 'VBD'
         elif pres_3sg:
             for tok in [root] + conj:
-                tok['form'] = pattern.en.conjugate(tok['form'], tense='present', person=3, number='singular')
+                # tok['form'] = conjugate(tok['form'], tense='present', person=3, number='singular')
+                try:
+                    tok['form'] = getInflection(self.lemmatizer.lemmatize(tok['form'], pos='v'), 'VBZ', inflect_oov=True)[0]
+                except:
+                    print(f"failed to inflect {tok['form']} to 'VBZ'")
                 tok['xpostag'] = 'VBZ'
         return
 
@@ -598,6 +606,7 @@ class AnswerSpan:
         self.root = self._get_rel('root')
         self.cop = self._get_rel('cop')
         self.type = self._type()
+        self.lemmatizer = WordNetLemmatizer()
 
     def _isvalid(self):
         return len(self.answer) > 0
@@ -649,12 +658,14 @@ class AnswerSpan:
                 if tok['form'] == 'leave':
                     new_form = 'left'
                 else:
-                    new_form = pattern.en.conjugate(tok['form'], tense='past')
+                    # new_form = pattern.en.conjugate(tok['form'], tense='past')
+                    new_form = getInflection(self.lemmatizer.lemmatize(tok['form'], pos='v'), 'VBD', inflect_oov=True)[0]
                 tok['form'] = new_form
                 tok['xpostag'] = 'VBD'
         elif pres_3sg:
             for tok in [root] + conj:
-                tok['form'] = pattern.en.conjugate(tok['form'], tense='present', person=3, number='singular')
+                # tok['form'] = pattern.en.conjugate(tok['form'], tense='present', person=3, number='singular')
+                tok['form'] = getInflection(self.lemmatizer.lemmatize(tok['form'], pos='v'), 'VBZ', inflect_oov=True)[0]
                 tok['xpostag'] = 'VBZ'
         return
 
