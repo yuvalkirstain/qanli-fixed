@@ -3,7 +3,7 @@
 import string
 import pattern
 from copy import deepcopy
-from pattern.text import conjugate
+
 from pyinflect import getInflection
 from nltk.stem import WordNetLemmatizer
 

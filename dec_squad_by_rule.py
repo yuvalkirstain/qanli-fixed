@@ -9,7 +9,6 @@ from conllu import parse
 from tqdm import tqdm
 
 from rule import Question, AnswerSpan
-import pattern
 
 from allennlp.predictors.predictor import Predictor
 import allennlp_models.structured_prediction
